@@ -31,6 +31,34 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Playful interactive features */
+        .playful-bounce { animation: playful-bounce 2.5s ease-in-out infinite; }
+        @keyframes playful-bounce { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-6px);} }
+        .pulse-ring { position: relative; }
+        .pulse-ring:before { content:""; position:absolute; inset:-6px; border:2px solid #3A5A40; border-radius:9999px; animation:pulse 2s linear infinite; opacity:.4; }
+        @keyframes pulse { 0% { transform: scale(.85); opacity:.6;} 70% { transform: scale(1.15); opacity:0;} 100% { transform: scale(1.15); opacity:0;} }
+        .gradient-border { position:relative; }
+    .gradient-border:before { content:""; position:absolute; inset:0; padding:2px; border-radius:1.25rem; background:linear-gradient(120deg,#3A5A40,#87CEEB,#E5D9B6); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+        .persona-btn[aria-pressed="true"] { background:#3A5A40; color:#fff; box-shadow:0 4px 14px -2px rgba(58,90,64,.4); }
+        .intent-bubble { position:absolute; padding:.5rem 1rem; background:#ffffffdd; border-radius:9999px; font-size:.75rem; font-weight:600; color:#3A5A40; box-shadow:0 4px 12px -4px rgba(0,0,0,.15); animation: drift 18s linear infinite; white-space:nowrap; }
+        @keyframes drift { 0% { transform:translateY(0) translateX(0) rotate(0deg);} 50% { transform:translateY(-120px) translateX(40px) rotate(6deg);} 100% { transform:translateY(-240px) translateX(-30px) rotate(-4deg); opacity:0;} }
+        #intentionCanvas { pointer-events:none; }
+        /* Confetti */
+        .confetti-piece { position:fixed; width:8px; height:12px; top:-12px; opacity:0; animation: fall 4s linear forwards; }
+        @keyframes fall { 0% { transform:translateY(-10px) rotate(0deg); opacity:1;} 80% { opacity:1;} 100% { transform:translateY(110vh) rotate(480deg); opacity:0;} }
+        /* Session reveal cards */
+        .session-card { transition: transform .4s, background .4s; cursor:pointer; }
+        .session-card:hover { transform: translateY(-6px) rotate(-1deg); background:#ffffff; }
+        .session-card.revealed { border-color:#3A5A40; background:#f1f5f3; }
+        .reveal-badge { font-size:.65rem; letter-spacing:.05em; background:#3A5A40; color:#fff; padding:.25rem .5rem; border-radius:.5rem; }
+        /* Range styling */
+        .range-wrap { position:relative; }
+        .bubble { background:#3A5A40; color:#fff; padding:.25rem .5rem; position:absolute; top:-40px; left:50%; transform:translateX(-50%); border-radius:.5rem; font-size:.65rem; }
+        .progress-ring circle { transition: stroke-dashoffset .35s; }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition:none !important; }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -40,6 +68,7 @@
         <div class="container mx-auto px-6">
             <h1 class="text-4xl md:text-6xl font-bold brand-sage">Shifoyage’s Evolve Meet</h1>
             <p class="mt-4 text-lg md:text-2xl text-stone-700">A Space for Fun, Growth, Connection, and Discovery</p>
+            <p class="mt-2 text-sm md:text-base text-stone-600 italic">Complete beginners • community seekers • ready-to-transform individuals</p>
             <div class="mt-8 text-lg font-semibold bg-white inline-block px-6 py-3 rounded-full shadow-md">
                 🗓️ 15 Aug 2025 (Evening 5 PM – 9 PM)
             </div>
@@ -54,7 +83,64 @@
 
     <main class="container mx-auto px-6 py-16 space-y-24">
 
-        <!-- What is Evolve Meet Section -->
+        <!-- New: Who Is This For (Interactive Personas) -->
+        <section class="fade-in-section max-w-5xl mx-auto">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl md:text-5xl font-bold brand-sage playful-bounce">Who Is This For?</h2>
+                <p class="mt-4 text-stone-700 max-w-2xl mx-auto">Evolve Meet welcomes you exactly where you are. Choose the badge that feels closest – or explore them all.</p>
+            </div>
+            <div class="flex flex-col md:flex-row gap-6 md:gap-4 items-stretch">
+                <div class="md:w-1/3 space-y-3">
+                    <button class="persona-btn w-full px-5 py-4 rounded-2xl bg-white shadow session-card text-left" data-persona="beginner" aria-pressed="true">
+                        <div class="flex items-center justify-between"><span class="font-semibold">🌱 Complete Beginner</span><span class="reveal-badge">START</span></div>
+                        <p class="text-xs mt-1 text-stone-600">Curious but unsure where to begin</p>
+                    </button>
+                    <button class="persona-btn w-full px-5 py-4 rounded-2xl bg-white shadow session-card text-left" data-persona="community" aria-pressed="false">
+                        <div class="flex items-center justify-between"><span class="font-semibold">🤝 Seeking Community</span><span class="reveal-badge bg-brand-sky">CONNECT</span></div>
+                        <p class="text-xs mt-1 text-stone-600">Wanting meaningful, real people-space</p>
+                    </button>
+                    <button class="persona-btn w-full px-5 py-4 rounded-2xl bg-white shadow session-card text-left" data-persona="transform" aria-pressed="false">
+                        <div class="flex items-center justify-between"><span class="font-semibold">🔥 Ready To Transform</span><span class="reveal-badge bg-stone-800">SHIFT</span></div>
+                        <p class="text-xs mt-1 text-stone-600">Prepared to stretch and evolve</p>
+                    </button>
+                </div>
+                <div class="md:w-2/3 gradient-border relative rounded-2xl bg-white p-8 flex flex-col justify-between">
+                    <div id="personaContent" class="space-y-4">
+                        <h3 class="text-2xl font-bold brand-sage">🌱 Begin Where You Are</h3>
+                        <p class="text-stone-700 leading-relaxed">Never journaled? Not into meditation yet? Perfect. We gently introduce you to self-reflection through fun, low-pressure, creative prompts that feel more like play than 'work on yourself'.</p>
+                        <ul class="text-sm space-y-2 text-stone-600">
+                            <li>• Zero jargon, zero judgment</li>
+                            <li>• Learn by <span class="font-semibold">doing & sharing</span>, not lecturing</li>
+                            <li>• Leave with 2–3 simple self-growth habits</li>
+                        </ul>
+                    </div>
+                    <div class="pt-6 flex flex-wrap gap-3 text-xs">
+                        <span class="px-3 py-1 rounded-full bg-brand-sage text-white">Inclusive</span>
+                        <span class="px-3 py-1 rounded-full bg-brand-sky text-stone-800">Play-Based</span>
+                        <span class="px-3 py-1 rounded-full bg-stone-800 text-white">Safe Space</span>
+                        <span class="px-3 py-1 rounded-full bg-brand-sand text-stone-800">Real Humans</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New: Energy Meter / Mood Check-In -->
+        <section class="fade-in-section max-w-3xl mx-auto text-center bg-white p-10 rounded-3xl shadow-sm relative overflow-hidden">
+            <h2 class="text-3xl md:text-4xl font-bold brand-sage mb-2">How Are You Arriving Today?</h2>
+            <p class="text-stone-600 mb-8">Slide to set your current energy. We meet you where you are.</p>
+            <div class="range-wrap mx-auto max-w-md">
+                <input id="energyRange" type="range" min="0" max="100" value="35" class="w-full accent-[#3A5A40]">
+                <div class="bubble" id="energyBubble">Gentle Flow</div>
+            </div>
+            <div class="mt-8 grid grid-cols-3 gap-4 text-sm">
+                <div class="p-4 rounded-xl bg-brand-sand/40" id="energyTag1">You Belong</div>
+                <div class="p-4 rounded-xl bg-brand-sand/40" id="energyTag2">Low-Pressure Growth</div>
+                <div class="p-4 rounded-xl bg-brand-sand/40" id="energyTag3">Soft Start Activities</div>
+            </div>
+            <canvas id="intentionCanvas" width="400" height="120" class="absolute bottom-0 left-1/2 -translate-x-1/2 opacity-30"></canvas>
+        </section>
+
+        <!-- Existing: What is Evolve Meet Section -->
         <section class="fade-in-section max-w-4xl mx-auto text-center">
             <h2 class="text-4xl md:text-5xl font-bold brand-sage">What is Evolve Meet?</h2>
             <div class="mt-8 text-lg text-stone-700 space-y-6 text-left bg-white p-8 rounded-2xl shadow-sm">
@@ -70,7 +156,17 @@
             </div>
         </section>
 
-        <!-- Schedule Timeline Section -->
+        <!-- New: Interactive Session Reveal -->
+        <section class="fade-in-section max-w-5xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-6 brand-sage">Unlock The Flow</h2>
+            <p class="text-center text-stone-600 mb-10 max-w-2xl mx-auto">Each session is intentionally unnamed to spark curiosity. Tap to reveal a playful hint + what it nurtures in you.</p>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5" id="sessionGrid">
+                <!-- Cards injected by JS -->
+            </div>
+            <p class="text-xs text-center text-stone-500 mt-6">(Full details shared with confirmed participants)</p>
+        </section>
+
+        <!-- Existing Schedule Timeline Section -->
         <section class="fade-in-section">
             <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 brand-sage">The Flow of the Evening</h2>
             <div class="max-w-2xl mx-auto">
@@ -124,6 +220,20 @@
             </div>
         </section>
 
+        <!-- New: Community Intention Board -->
+        <section class="fade-in-section relative overflow-hidden bg-brand-sand/40 p-10 rounded-3xl">
+            <h2 class="text-3xl md:text-4xl font-bold text-center brand-sage mb-2">Add Your Intention</h2>
+            <p class="text-center text-stone-600 mb-6">One word you want to feel / build / explore tonight.</p>
+            <form id="intentionForm" class="max-w-md mx-auto flex gap-3">
+                <input required maxlength="18" placeholder="e.g. Courage" class="flex-1 px-4 py-3 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-brand-sage" />
+                <button class="px-6 py-3 rounded-xl bg-brand-sage text-white font-semibold hover:bg-brand-sage/90 transition">Add</button>
+            </form>
+            <div id="intentionField" class="mt-8 h-64 relative">
+                <!-- bubbles -->
+            </div>
+            <p class="text-center text-xs text-stone-500 mt-4">(Local only • refresh clears board)</p>
+        </section>
+
         <!-- Share-e-Dabba Section -->
         <section class="fade-in-section text-center bg-white p-12 rounded-2xl shadow-sm">
             <h2 class="text-4xl font-bold brand-sage">🍴 Share-e-Dabba</h2>
@@ -171,6 +281,152 @@
                 });
             }, { threshold: 0.1 });
             sections.forEach(section => { observer.observe(section); });
+        });
+
+        /* Persona Switcher */
+        const personaData = {
+            beginner: {
+                title:"🌱 Begin Where You Are",
+                body:`Never journaled? Not into meditation yet? Perfect. We gently introduce you to self-reflection through fun, low-pressure, creative prompts that feel more like play than 'work on yourself'.`,
+                bullets:["Zero jargon, zero judgment","Learn by doing & sharing","Leave with 2–3 simple self-growth habits"],
+            },
+            community: {
+                title:"🤝 Find Your People",
+                body:"You crave spaces where small talk dissolves. Expect facilitated sharing, collaborative games, and micro-moments that build trust fast (without forcing it).",
+                bullets:["Guided meaningful conversations","Creative team mini-challenges","Belonging > performance"],
+            },
+            transform: {
+                title:"🔥 Ready To Shift",
+                body:"You're hungry for stretch. We'll nudge you into expressive movement, reflective depth, and co-creation sprints that catalyze real internal motion.",
+                bullets:["Edge-play without overwhelm","Embodied + reflective balance","Momentum you can take home"],
+            }
+        };
+        const personaBtns = document.querySelectorAll('.persona-btn');
+        const personaContent = document.getElementById('personaContent');
+        personaBtns.forEach(btn => btn.addEventListener('click', () => {
+            personaBtns.forEach(b=>b.setAttribute('aria-pressed','false'));
+            btn.setAttribute('aria-pressed','true');
+            const key = btn.dataset.persona;
+            const d = personaData[key];
+            personaContent.innerHTML = `
+                <h3 class="text-2xl font-bold brand-sage">${d.title}</h3>
+                <p class="text-stone-700 leading-relaxed">${d.body}</p>
+                <ul class="text-sm space-y-2 text-stone-600">${d.bullets.map(b=>`<li>• ${b}</li>`).join('')}</ul>
+            `;
+        }));
+
+        /* Energy Meter */
+        const energyRange = document.getElementById('energyRange');
+        const energyBubble = document.getElementById('energyBubble');
+        const energyTag1 = document.getElementById('energyTag1');
+        const energyTag2 = document.getElementById('energyTag2');
+        const energyTag3 = document.getElementById('energyTag3');
+        const moods = [
+            { label:'Gentle Flow', tags:['You Belong','Low-Pressure Growth','Soft Start Activities'] },
+            { label:'Opening Up', tags:['Warm-Up Sharing','Light Creative','Supportive Circle'] },
+            { label:'Charged & Curious', tags:['Group Momentum','Stretch Moments','Deeper Reflection'] }
+        ];
+        function updateEnergyUI(val){
+            const idx = val < 40 ? 0 : val < 70 ? 1 : 2;
+            energyBubble.textContent = moods[idx].label;
+            [energyTag1,energyTag2,energyTag3].forEach((el,i)=> el.textContent = moods[idx].tags[i]);
+            const percent = (val/100)*energyRange.offsetWidth;
+            energyBubble.style.left = `calc(${val}% )`;
+        }
+        energyRange.addEventListener('input', e=> updateEnergyUI(+e.target.value));
+        updateEnergyUI(+energyRange.value);
+
+        /* Light canvas ambient dots */
+        const ic = document.getElementById('intentionCanvas');
+        if(ic){
+            const ctx = ic.getContext('2d');
+            function draw(){
+                ctx.clearRect(0,0,ic.width,ic.height);
+                for(let i=0;i<25;i++){
+                    const x = (Date.now()/40 + i*50) % ic.width;
+                    const y = (Math.sin((Date.now()/800)+i)*20)+60 + (i%5)*4;
+                    ctx.fillStyle = `rgba(58,90,64,${0.08 + (i%5)*0.02})`;
+                    ctx.beginPath(); ctx.arc(x,y, i%3+1,0,Math.PI*2); ctx.fill();
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        /* Interactive Session Reveal */
+        const sessionGrid = document.getElementById('sessionGrid');
+        const sessionSeeds = [
+            { emoji:'🌀', title:'Session 1', hint:'Inner scan ritual', grows:'Self Awareness' },
+            { emoji:'🎲', title:'Session 2', hint:'Play reframed', grows:'Creative Openness' },
+            { emoji:'⚡', title:'Session 3', hint:'Energy ignition', grows:'Body Activation' },
+            { emoji:'💃', title:'Session 4', hint:'Expressive release', grows:'Confidence' },
+            { emoji:'🛠️', title:'Session 5', hint:'Build together', grows:'Collaboration' },
+            { emoji:'🍃', title:'Session 6', hint:'Gentle reset', grows:'Calm Center' },
+            { emoji:'🤹', title:'Session 7', hint:'Laughter catalyst', grows:'Lightness' },
+            { emoji:'🎨', title:'Session 8', hint:'Raw creation', grows:'Authentic Voice' },
+        ];
+        sessionSeeds.forEach((s,i)=>{
+            const card = document.createElement('div');
+            card.className = 'session-card bg-white rounded-2xl p-5 border border-stone-200 shadow-sm flex flex-col justify-between';
+            card.innerHTML = `
+                <div class='text-3xl mb-4'>${s.emoji}</div>
+                <div>
+                    <h3 class='font-semibold mb-1'>${s.title}</h3>
+                    <p class='text-xs text-stone-500 italic hidden'>${s.hint}</p>
+                    <p class='text-xs mt-2 font-medium text-brand-sage hidden grow-pill'>Grows: ${s.grows}</p>
+                </div>
+                <button class='mt-4 text-xs px-3 py-2 rounded-lg bg-brand-sage text-white reveal-btn'>Reveal Hint</button>
+            `;
+            card.querySelector('.reveal-btn').addEventListener('click',()=>{
+                card.classList.add('revealed');
+                card.querySelectorAll('p').forEach(p=>p.classList.remove('hidden'));
+                card.querySelector('.reveal-btn').remove();
+            });
+            sessionGrid.appendChild(card);
+        });
+
+        /* Community Intention Board */
+        const intentionForm = document.getElementById('intentionForm');
+        const intentionField = document.getElementById('intentionField');
+        const activeBubbles = [];
+        function addBubble(word){
+            if(activeBubbles.length >= 15){
+                const oldest = activeBubbles.shift(); oldest.remove();
+            }
+            const b = document.createElement('div');
+            b.className='intent-bubble';
+            b.textContent = word; b.style.left = Math.random()*70 + '%'; b.style.bottom='0';
+            b.style.animationDuration = (14 + Math.random()*10) + 's';
+            intentionField.appendChild(b); activeBubbles.push(b);
+            setTimeout(()=>{ b.remove(); const idx = activeBubbles.indexOf(b); if(idx>-1) activeBubbles.splice(idx,1); }, 24000);
+        }
+        intentionForm?.addEventListener('submit', e=>{
+            e.preventDefault();
+            const input = intentionForm.querySelector('input');
+            const val = input.value.trim(); if(!val) return;
+            addBubble(val); input.value='';
+        });
+        ['Clarity','Joy','Trust','Ease','Belonging'].forEach(addBubble);
+
+        /* Confetti on booking click */
+        function launchConfetti(){
+            for(let i=0;i<70;i++){
+                const p = document.createElement('div');
+                p.className='confetti-piece';
+                p.style.left = Math.random()*100 + 'vw';
+                p.style.background = ['#3A5A40','#87CEEB','#E5D9B6','#292524'][i%4];
+                p.style.animationDelay = (Math.random()*0.5)+'s';
+                p.style.transform = `rotate(${Math.random()*360}deg)`;
+                document.body.appendChild(p);
+                setTimeout(()=>p.remove(), 4200);
+            }
+        }
+        document.querySelectorAll('a,button').forEach(el=>{
+            if(/Reserve My Spot/i.test(el.textContent)){
+                el.addEventListener('click', ()=>{
+                    launchConfetti();
+                })
+            }
         });
     </script>
 
